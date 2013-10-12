@@ -1,0 +1,85 @@
+<project name="qstruts2" default="build" basedir=".">
+
+	<property name="version" value="1.0"/>
+	<property name="src.dir" value="src/main/java" />
+	<property name="lib.dir" value="web/WEB-INF/lib" />
+	<property name="build.dir" value="build" />
+	<property name="dist.dir" value="dist" />
+	<property name="repository.dir" value="D:/workspace/new_oj/web/WEB-INF/lib" />
+
+	<path id="build.classpath">
+		<pathelement location="${build.dir}/classes" />
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="init">
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<target name="prepare" depends="clean,init">
+		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${build.dir}/classes" />
+	</target>
+
+	<target name="build">
+
+	</target>
+
+	<condition property="isExistResources">
+		<and>
+			<available file="${src.dir}/../resources" type="dir"/>
+		</and>
+	</condition>
+
+	<target name="compile" depends="prepare">
+	    <javac srcdir="${src.dir}" destdir="${build.dir}/classes" debug="on" encoding="UTF-8">
+	    	<classpath>
+	    		<path refid="build.classpath"></path>
+	    	</classpath>
+	    </javac>
+		<copy todir="${build.dir}/classes">
+			<fileset dir="${src.dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+		<antcall target="copyResources" />
+	</target>
+
+	<target name="copyResources" if="isExistResources">
+		<copy todir="${build.dir}/classes">
+			<fileset dir="${src.dir}/../resources"></fileset>
+		</copy>
+	</target>
+
+	<target name="jar" depends="compile">
+	    <jar destfile="${dist.dir}/qstruts2-${version}.jar" basedir="${build.dir}/classes">
+	    	<manifest>
+				<attribute name="Manifest-Version" value="1.0" />
+				<attribute name="Created-By" value="xiangqh" />
+				<attribute name="Implementation-Title" value="qstruts2" />
+				<attribute name="Implementation-Vendor" value="xiangqh" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="SVN-Version" value="${svn.version}" />
+			</manifest>
+	    </jar>
+	</target>
+
+	<target name="zip">
+        <zip destfile="${dist.dir}/qstruts2-src-${version}.zip" basedir="${src.dir}"/>
+    </target>
+
+	<target name="release">
+		<antcall target="jar" />
+		<antcall target="zip" />
+		<copy todir="${repository.dir}" file="${dist.dir}/qstruts2-${version}.jar" />
+		<copy todir="D:/src" file="${dist.dir}/qstruts2-${version}.jar" />
+		<copy todir="D:/src" file="${dist.dir}/qstruts2-src-${version}.zip" />
+	</target>
+
+</project>
