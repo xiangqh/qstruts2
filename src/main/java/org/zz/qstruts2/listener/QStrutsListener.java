@@ -26,21 +26,24 @@ import com.opensymphony.xwork2.util.logging.LoggerFactory;
  */
 public class QStrutsListener implements ServletContextListener {
 
+	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(QStrutsListener.class);
+
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 
 		ServletContext sc = sce.getServletContext();
 
 		String actionPackage = sc.getInitParameter("actionPackage");
-		if(actionPackage == null) {
+		if (actionPackage == null) {
 			actionPackage = "";
 		}
 		String[] packageNames = actionPackage.split(",");
-		for(String packageName : packageNames) {
+		for (String packageName : packageNames) {
 			String packageDirName = packageName.replace('.', '/');
 			URL url = QStrutsListener.class.getClassLoader().getResource(packageDirName);
-			if(url == null) return;
+			if (url == null)
+				return;
 			String protocol = url.getProtocol();
 			if ("file".equals(protocol)) {
 				parseFile(url, packageName);
@@ -65,11 +68,11 @@ public class QStrutsListener implements ServletContextListener {
 		file.listFiles(new FileFilter() {
 			public boolean accept(File file) {
 				String fileName = file.getName();
-				if(fileName.endsWith(".class") && !fileName.contains("$")) {
-					parseClass(packageName+"."+fileName.substring(0,file.getName().length() - 6));
-				}else if(file.isDirectory()) {
+				if (fileName.endsWith(".class") && !fileName.contains("$")) {
+					parseClass(packageName + "." + fileName.substring(0, file.getName().length() - 6));
+				} else if (file.isDirectory()) {
 					try {
-						parseFile(file.toURI().toURL(),packageName+"."+fileName);
+						parseFile(file.toURI().toURL(), packageName + "." + fileName);
 					} catch (MalformedURLException e) {
 						e.printStackTrace();
 					}
@@ -82,17 +85,15 @@ public class QStrutsListener implements ServletContextListener {
 	private void parseJar(URL url, String packageName) {
 		Enumeration<JarEntry> entries = null;
 		try {
-			entries = ((JarURLConnection)url.openConnection()).getJarFile().entries();
+			entries = ((JarURLConnection) url.openConnection()).getJarFile().entries();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		while(entries.hasMoreElements()) {
+		while (entries.hasMoreElements()) {
 			JarEntry entry = entries.nextElement();
 			String fileName = entry.getName();
-			if (!fileName.endsWith(".class") || fileName.contains("$")
-					|| !fileName.startsWith(packageName + "/"))
+			if (!fileName.endsWith(".class") || fileName.contains("$") || !fileName.startsWith(packageName + "/"))
 				continue;
 			parseClass(fileName.substring(0, fileName.length() - 6).replace("/", "."));
 		}
@@ -107,7 +108,7 @@ public class QStrutsListener implements ServletContextListener {
 			e.printStackTrace();
 		}
 
-		if(clazz!=null && clazz.isAnnotationPresent(ActionController.class)) {
+		if (clazz != null && clazz.isAnnotationPresent(ActionController.class)) {
 			ActionController controller = clazz.getAnnotation(ActionController.class);
 			String actionName = controller.value();
 			RuntimeProvider.addPackageConfig(clazz, actionName, className);

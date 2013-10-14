@@ -32,7 +32,7 @@ public class InitOperations {
         String factoryName = filterConfig.getInitParameter("loggerFactory");
         if (factoryName != null) {
             try {
-                Class cls = ClassLoaderUtil.loadClass(factoryName, this.getClass());
+                Class<?> cls = ClassLoaderUtil.loadClass(factoryName, this.getClass());
                 LoggerFactory fac = (LoggerFactory) cls.newInstance();
                 LoggerFactory.setLoggerFactory(fac);
             } catch ( InstantiationException e ) {
@@ -84,7 +84,7 @@ public class InitOperations {
      */
     private Dispatcher createDispatcher( HostConfig filterConfig ) {
         Map<String, String> params = new HashMap<String, String>();
-        for ( Iterator e = filterConfig.getInitParameterNames(); e.hasNext(); ) {
+        for ( Iterator<?> e = filterConfig.getInitParameterNames(); e.hasNext(); ) {
             String name = (String) e.next();
             String value = filterConfig.getInitParameter(name);
             params.put(name, value);
@@ -108,7 +108,7 @@ public class InitOperations {
     public List<Pattern> buildExcludedPatternsList( Dispatcher dispatcher ) {
         return buildExcludedPatternsList(dispatcher.getContainer().getInstance(String.class, StrutsConstants.STRUTS_ACTION_EXCLUDE_PATTERN));
     }
-            
+
     private List<Pattern> buildExcludedPatternsList( String patterns ) {
         if (null != patterns && patterns.trim().length() != 0) {
             List<Pattern> list = new ArrayList<Pattern>();

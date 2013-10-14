@@ -31,7 +31,8 @@ public class ContextUtil {
     public static final String STRUTS = "struts";
     public static final String ACTION = "action";
 
-    public static Map getStandardContext(ActionContext ac, HttpServletRequest req, HttpServletResponse res) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map getStandardContext(ActionContext ac, HttpServletRequest req, HttpServletResponse res) {
         HashMap map = new HashMap();
         map.put(REQUEST, req);
         map.put(REQUEST2, req);
@@ -55,7 +56,8 @@ public class ContextUtil {
      * @param context stack's context
      * @return boolean
      */
-    public static boolean isUseAltSyntax(Map context) {
+    @SuppressWarnings("rawtypes")
+	public static boolean isUseAltSyntax(Map context) {
         // We didn't make altSyntax static cause, if so, struts.configuration.xml.reload will not work
         // plus the Configuration implementation should cache the properties, which the framework's
         // configuration implementation does
@@ -70,7 +72,8 @@ public class ContextUtil {
      * @param context stack's context
      * @return String
      */
-    public static String getTemplateSuffix(Map context) {
+    @SuppressWarnings("rawtypes")
+	public static String getTemplateSuffix(Map context) {
         return context.containsKey("templateSuffix") ? (String) context.get("templateSuffix") : null;
     }
 
