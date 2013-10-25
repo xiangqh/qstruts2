@@ -1,15 +1,20 @@
 package org.zz.qstruts2.action;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts2.ServletActionContext;
+import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
+import org.zz.qstruts2.upload.UploadBean;
 
 /**
  * @author xiangqh
- *
+ * 
  */
 public class QAction {
 
@@ -59,7 +64,20 @@ public class QAction {
 		return null;
 	}
 
-	public Integer getParameterInt(String key) {
+	public int getParameterInt(String key) {
+		String temp = getHttpParameter(key);
+		if (temp == null) {
+			return 0;
+		}
+		try {
+			return Integer.parseInt(temp);
+		} catch (Exception e) {
+
+		}
+		return 0;
+	}
+
+	public Integer getParameterInteger(String key) {
 		String temp = getHttpParameter(key);
 		if (temp == null) {
 			return null;
@@ -97,4 +115,23 @@ public class QAction {
 		}
 		return null;
 	}
+
+	public List<UploadBean> getUpLoadFiles() {
+		List<UploadBean> list = new ArrayList<UploadBean>();
+		HttpServletRequest requset = getHttpServletRequest();
+		if (requset instanceof MultiPartRequestWrapper) {
+			MultiPartRequestWrapper request = (MultiPartRequestWrapper) getHttpServletRequest();
+			Enumeration<String> fileNames = request.getFileParameterNames();
+			while (fileNames.hasMoreElements()) {
+				String fieldName = fileNames.nextElement();
+				UploadBean uploadBean = new UploadBean();
+				uploadBean.setFiles(request.getFiles(fieldName));
+				uploadBean.setFileNames(request.getFileNames(fieldName));
+				uploadBean.setContentTypes(request.getContentTypes(fieldName));
+				list.add(uploadBean);
+			}
+		}
+		return list;
+	}
+
 }
